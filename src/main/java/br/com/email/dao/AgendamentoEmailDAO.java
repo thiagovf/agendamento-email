@@ -15,6 +15,10 @@ public class AgendamentoEmailDAO {
 	private EntityManager em;
 
 	public List<AgendamentoEmail> listar() {
-		return em.createQuery("SELECT as FROM Agendamento ae", AgendamentoEmail.class).getResultList();
+		return em.createQuery("SELECT ae FROM AgendamentoEmail ae", AgendamentoEmail.class).getResultList();
+	}
+	
+	public void inserir(AgendamentoEmail agendamentoEmail) {
+		em.persist(agendamentoEmail);
 	}
 }

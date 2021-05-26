@@ -1,9 +1,11 @@
 package br.com.email.entidade;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+@Entity
 public class AgendamentoEmail {
 
 	@Id
@@ -12,9 +14,11 @@ public class AgendamentoEmail {
 	
 	private String assunto;
 	
-	private String menssagem;
+	private String mensagem;
 	
 	private Boolean agendado;
+	
+	private String email;
 
 	@Override
 	public int hashCode() {
@@ -49,12 +53,12 @@ public class AgendamentoEmail {
 		this.assunto = assunto;
 	}
 
-	public String getMenssagem() {
-		return menssagem;
+	public String getMensagem() {
+		return mensagem;
 	}
 
-	public void setMenssagem(String menssagem) {
-		this.menssagem = menssagem;
+	public void setMensagem(String mensagem) {
+		this.mensagem = mensagem;
 	}
 
 	public Boolean getAgendado() {
@@ -63,6 +67,14 @@ public class AgendamentoEmail {
 
 	public void setAgendado(Boolean agendado) {
 		this.agendado = agendado;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }
