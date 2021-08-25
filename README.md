@@ -41,5 +41,10 @@ jms-queue add --queue-address=EmailQueue --entries=java:/jms/queue/EmailQueue
 ```
 * **--queue-address** define o nome da fila no próprio Wildfly.
 * **--entries=java** é a forma como a aplicação vai acessar a fila.
+### Mudança no código
+Na classe AgendamentoEmailJob, precisaremos fazer alguns ajustes.
+<codigo da classe aqui>
+Onde a anotação @JMSConnectionFactory vai definir a *fábrica de conexão* da fila que iremos usar a padrão que já vem configurada "java:jboss/DefaultJMSConnectionFactory", representada no código pelo JMSContext.  
+Entendido isso, também adicionamos a fila recuperando através do @Resource pelo JNDI que criamos anteriormente.
 
 
