@@ -20,3 +20,26 @@ public class AgendamentoEmailJob {
   ```
 ## Configurando fila no Wildfly
 O uso da fila visa evitar que ao ocorrer um erro no envio de um e-mail, a aplicação consiga  enviar os demais e-mails.
+### Tornando a classe AgendamentoEmail serializável
+Para que seja possível o uso de fila, precisa tornar a classe serializável.
+```java
+...
+public class AgendamentoEmail implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+    ...
+```
+### Configurando o Wildfly
+Para o uso de fila, poderíamos usar um repositório externo ou através do servidor de aplicação. No curso, optou-se por esta forma.
+1. Inicia o Wildfly pelo Eclipse.
+2. Uma vez iniciado, ir até a pasta bin através do terminal dentro da pasta do servidor de aplicação.
+3. Inicia o jboss-cli.sh.
+4. connect
+5. Executar o comando a seguir.
+```
+jms-queue add --queue-address=EmailQueue --entries=java:/jms/queue/EmailQueue
+```
+* **--queue-address** define o nome da fila no próprio Wildfly.
+* **--entries=java** é a forma como a aplicação vai acessar a fila.
+
+
