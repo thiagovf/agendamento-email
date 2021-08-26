@@ -74,4 +74,10 @@ public class AgendamentoEmailJob {
 Com o servidor inicializado, acessar o [administrativo do Wildfly](http://127.0.0.1:9990).  
 ![wildfly-admin](https://github.com/thiagovf/agendamento-email/blob/master/wildfly-admin.png?raw=true)
 ## Criação do consumer 
-O consumidor é que  vai realmente enviar o e-mail. Ele irá recuperar da fila e enviar o e-mail.
+O consumidor é que  vai realmente enviar o e-mail. Ele irá recuperar da fila e enviar o e-mail. Para isso, utilizamos o [Message-Driven Bean (MDB)](https://docs.oracle.com/cd/A97688_16/generic.903/a97677/mdb.htm) que irá permitir abstrair várias implementações no consumo da fila.  
+![MDB-Oracle](https://docs.oracle.com/cd/A97688_16/generic.903/a97677/mdba.gif)  
+A ideia do MDB (código abaixo) é que ele fique escutando e quando tiver mensagem na fila, ele envie o e-mail para os destinatários.  
+<codigo-aqui>  
+	</codigo-aqui>  
+* A anotação ```@MessageDriven``` vai definir a classe como um MDB. 
+* Dentro dela, precisamos fazer algumas configurações através do parâmetro ```activationConfig```.
