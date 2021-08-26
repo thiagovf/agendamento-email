@@ -36,6 +36,9 @@ public class AgendamentoEmailServico {
 	}
 	
 	public void enviar(AgendamentoEmail agendamentoEmail) {
+		/*
+		 * Simulação de e-mail. Para envio de e-mail real, usar JavaMail.
+		 */
 		try {
 			Thread.sleep(5000);
 			LOGGER.info("E-mail do usuário " + agendamentoEmail.getEmail() + " foi enviado.");
