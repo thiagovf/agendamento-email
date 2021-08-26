@@ -70,6 +70,8 @@ public class AgendamentoEmailJob {
 * O @JMSConnectionFactory vai definir a *fábrica de conexão* da fila que iremos usar a padrão que já vem configurada "java:jboss/DefaultJMSConnectionFactory", representada no código pelo JMSContext.  
 * Também adicionamos a fila recuperando através do @Resource pelo JNDI que criamos anteriormente.
 * Por fim coloca na fila o e-mail para ser enviado através do trecho ```context.createProducer().send(queue, agendamentoNaoEnviado);```  
-## Verificando se o agendamento funcionou
+### Verificando se o agendamento funcionou
 Com o servidor inicializado, acessar o [administrativo do Wildfly](http://127.0.0.1:9990).  
 ![wildfly-admin](https://github.com/thiagovf/agendamento-email/blob/master/wildfly-admin.png?raw=true)
+## Criação do consumer 
+O consumidor é que  vai realmente enviar o e-mail. Ele irá recuperar da fila e enviar o e-mail.
