@@ -43,8 +43,33 @@ jms-queue add --queue-address=EmailQueue --entries=java:/jms/queue/EmailQueue
 * **--entries=java** é a forma como a aplicação vai acessar a fila.
 ### Mudança no código
 Na classe AgendamentoEmailJob, precisaremos fazer alguns ajustes.
-<codigo da classe aqui>
-Onde a anotação @JMSConnectionFactory vai definir a *fábrica de conexão* da fila que iremos usar a padrão que já vem configurada "java:jboss/DefaultJMSConnectionFactory", representada no código pelo JMSContext.  
-Entendido isso, também adicionamos a fila recuperando através do @Resource pelo JNDI que criamos anteriormente.
+```java
+@Singleton
+public class AgendamentoEmailJob {
+	
+	@Inject
+	private AgendamentoEmailServico agendamentoEmailServico;
+	
+	@Inject
+	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
+	private JMSContext context;
+	
+	@Resource(mappedName = "java:/jms/queue/EmailQueue")
+	private Queue queue;
 
-
+	@Schedule(hour = "*", minute = "*", second = "*/10")
+	public void enviarEmails() {
+		List<AgendamentoEmail> listaAgendamentos = agendamentoEmailServico.listarPorNaoAgendado();
+		listaAgendamentos.forEach(agendamentoNaoEnviado -> {
+			context.createProducer().send(queue, agendamentoNaoEnviado);
+			agendamentoEmailServico.alterar(agendamentoNaoEnviado);
+		});
+	}
+}
+```
+* O @JMSConnectionFactory vai definir a *fábrica de conexão* da fila que iremos usar a padrão que já vem configurada "java:jboss/DefaultJMSConnectionFactory", representada no código pelo JMSContext.  
+* Também adicionamos a fila recuperando através do @Resource pelo JNDI que criamos anteriormente.
+* Por fim coloca na fila o e-mail para ser enviado através do trecho ```context.createProducer().send(queue, agendamentoNaoEnviado);```
+##Verificando se o agendamento funcionou
+Com o servidor inicializado, acessar o [administrativo do Wildfly](http://127.0.0.1:9990).
+![wildfly-admin](https://github.com/thiagovf/agendamento-email/blob/master/wildfly-admin.png?raw=true)
