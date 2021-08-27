@@ -1,10 +1,11 @@
 # Tabela de conteúdos
 1. [Agendamento Email](#agendamento-email)
     1. [Uso do Singleton](#uso-do-singleton)
-    2. [Configurando fila no Wildfly](#configurando-fila-no-wildfly)
+2. [Uso de Fila](#uso-de-fila)
+    1. [Configurando fila no Wildfly](#configurando-fila-no-wildfly)
        1. [Mudança no código](#mudança-no-código)
        2. [Verificando se o agendamento funcionou](#verificando-se-o-agendamento-funcionou)
-    3. [Criação do consumer](#criação-do-consumer )
+    2. [Criação do consumer](#criação-do-consumer )
 # Agendamento Email
 Projeto EJB com Jakarta EE, refente a um curso.\
 Jakarta EE passou a se chamar assim depois que a Oracle liberou para a Eclipse Foudation a manutenção e evolução do Java EE. A Oracle permaneceu com os direitos do nome Java EE, mas liberou sem custo o uso do projeto pela Eclipse. O nome Jakarta era da Apache que mantinha um grupo de projetos (Struts, Tomcat etc) sob esse guarda-chuva e que foi descontinuado em 2011, [Link Apache](https://jakarta.apache.org/site/news/news-2011-q4.html#20111221.1). A Apache também liberou para a Eclipse Foudantion usar o nome Jakarta EE sem custos.
@@ -25,6 +26,7 @@ public class AgendamentoEmailJob {
     }
 }
   ```
+# Uso de Fila
 ## Configurando fila no Wildfly
 O uso da fila visa evitar que ao ocorrer um erro no envio de um e-mail, a aplicação consiga  enviar os demais e-mails.
 ### Tornando a classe AgendamentoEmail serializável
