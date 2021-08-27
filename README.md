@@ -1,4 +1,4 @@
-# Table of Contents
+# Tabela de conteúdos
 1. [Agendamento Email](#agendamento-email)
     1. [Uso do Singleton](#uso-do-singleton)
     2. [Configurando fila no Wildfly](#configurando-fila-no-wildfly)
