@@ -69,7 +69,42 @@ public class AgendamentoEmailJob {
 ```
 * O @JMSConnectionFactory vai definir a *fábrica de conexão* da fila que iremos usar a padrão que já vem configurada "java:jboss/DefaultJMSConnectionFactory", representada no código pelo JMSContext.  
 * Também adicionamos a fila recuperando através do @Resource pelo JNDI que criamos anteriormente.
-* Por fim coloca na fila o e-mail para ser enviado através do trecho ```context.createProducer().send(queue, agendamentoNaoEnviado);```  
-## Verificando se o agendamento funcionou
+* Por fim, cria um produtor e coloca na fila o e-mail para ser enviado através do trecho ```context.createProducer().send(queue, agendamentoNaoEnviado);```  
+### Verificando se o agendamento funcionou
 Com o servidor inicializado, acessar o [administrativo do Wildfly](http://127.0.0.1:9990).  
 ![wildfly-admin](https://github.com/thiagovf/agendamento-email/blob/master/wildfly-admin.png?raw=true)
+## Criação do consumer 
+O consumidor é que  vai realmente enviar o e-mail. Ele irá recuperar da fila e enviar o e-mail. Para isso, utilizamos o [Message-Driven Bean (MDB)](https://docs.oracle.com/cd/A97688_16/generic.903/a97677/mdb.htm) que irá permitir abstrair várias implementações no consumo da fila.  
+![MDB-Oracle](https://docs.oracle.com/cd/A97688_16/generic.903/a97677/mdba.gif)  
+A ideia do MDB (código abaixo) é que ele fique escutando e quando tiver mensagem na fila, ele envie o e-mail para os destinatários.  
+```java  
+@MessageDriven(activationConfig = {
+		@ActivationConfigProperty(propertyName = "destinationLookup",
+				propertyValue = "java:/jms/queue/EmailQueue"),
+		@ActivationConfigProperty(propertyName = "destinationType",
+				propertyValue = "javax.jms.Queue")
+})
+public class AgendamentoEmailMDB implements MessageListener {
+
+	@Inject
+	private AgendamentoEmailServico servico;
+
+	@Override
+	public void onMessage(Message message) {
+		try {
+			AgendamentoEmail agendamentoEmail = message.getBody(AgendamentoEmail.class);
+			servico.enviar(agendamentoEmail);
+		} catch (JMSException e) {
+			throw new RuntimeException(e);
+		}
+	}
+}
+```
+* A anotação ```@MessageDriven``` vai definir a classe como um MDB. 
+* Dentro dela, precisamos fazer algumas configurações através do parâmetro ```activationConfig``` para definir qual a fila que vai ser escutada ```@ActivationConfigProperty(propertyName = "destinationLookup"...```. 
+* A outra propriedade ainda dentro do ```@ActivationConfigProperty```vai definir o tipo de fila ```propertyName = "destinationType"```. Nesse curso, estamos vendo o tipo Queue. Existem outros.
+* Feito isso, precisamos transformar a Message no tipo ```AgendamentoEmail```.  
+```java  
+AgendamentoEmail agendamentoEmail = message.getBody(AgendamentoEmail.class);
+servico.enviar(agendamentoEmail);
+```
