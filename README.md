@@ -119,3 +119,5 @@ public class AgendamentoEmailMDB implements MessageListener {
 AgendamentoEmail agendamentoEmail = message.getBody(AgendamentoEmail.class);
 servico.enviar(agendamentoEmail);
 ```
+## Controle trasancional
+Como estamos falando de uma aplicação que irá recuperar uma lista de e-mails a ser enviadas, caso ocorra algum erro no envio de um e-mail talvez não faça sentido que todos os demais e-mails da fila não sejam agendados. Dessa forma, é importante pensar bem a estratégia transacional.
