@@ -84,6 +84,73 @@ public class AgendamentoEmailJob {
 ### Verificando se o agendamento funcionou
 Com o servidor inicializado, acessar o [administrativo do Wildfly](http://127.0.0.1:9990).  
 ![wildfly-admin](https://github.com/thiagovf/agendamento-email/blob/master/wildfly-admin.png?raw=true)
+## Uso do @Schedule 
+*Voltar a este ponto para detalhar o uso do @Schedule*  
+No curso, fizemos uso da anotação @Schedule para que a tarefa seja executada constantemente. Essa parametrização por anotation tem sua utilidade, mas, no ambiente profissional, esbarrou com a necessidade de recuperar a parametrização do banco de dados, fazendo com que ela possa ser setada sem a necessidade de intervenção direta no código. Para isso, usei a classe ```javax.ejb.TimerService```. Conforme o trecho abaixo, ela permite fazer a definição dinâmica.
+```java
+@Singleton
+@Startup
+public class AgendamentEmailJobParametrizavel {
+
+	private static String VARIAVEL_TEMPO_BD = "hora.job.apoiamento";
+
+	@Resource
+	private TimerService timerService;
+	
+	@Inject
+	ParametroSistemaManager parametroSistemaManager;
+	
+	@Inject
+	private AgendamentoEmailServico agendamentoEmailServico;
+	
+	@Inject
+	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
+	private JMSContext context;
+	
+	@Resource(mappedName = "java:/jms/queue/EmailQueue")
+	private Queue queue;
+	
+	@PostConstruct
+	public void init() {
+		createTimer();
+	}
+
+	@Timeout
+	public void timerTimeout() {
+		executarVerificacao();
+	}
+
+	private void createTimer() {
+		ParametroSistema parametro = parametroSistemaManager.consultar(VARIAVEL_TEMPO_BD);
+
+		if(parametro != null) {
+			LocalTime tempoIntervalo = LocalTime.parse(parametro.getParametro());
+			ScheduleExpression scheduleExpression = new ScheduleExpression();
+			scheduleExpression
+				.second(tempoIntervalo.getSecond())
+				.minute(tempoIntervalo.getMinute())
+				.hour(tempoIntervalo.getHour());
+			TimerConfig timerConfig = new TimerConfig();
+			timerConfig.setPersistent(false);
+			timerService.createCalendarTimer(scheduleExpression, timerConfig);
+		} else {
+			StringBuilder mensagem = new StringBuilder();
+			mensagem.append("Parametro ")
+				.append(VARIAVEL_TEMPO_BD)
+				.append(" não informado no Banco de Dados.");
+			Logger.getLogger(getClass().getName()).log(Level.SEVERE, mensagem.toString());
+		}
+	}
+
+	public void executarVerificacao() {
+		List<AgendamentoEmail> listaAgendamentos = agendamentoEmailServico.listarPorNaoAgendado();
+		listaAgendamentos.forEach(agendamentoNaoEnviado -> {
+			context.createProducer().send(queue, agendamentoNaoEnviado);
+			agendamentoEmailServico.alterar(agendamentoNaoEnviado);
+		});
+	}
+}
+```
 ## Criação do consumer 
 O consumidor é que  vai realmente enviar o e-mail. Ele irá recuperar da fila e enviar o e-mail. Para isso, utilizamos o [Message-Driven Bean (MDB)](https://docs.oracle.com/cd/A97688_16/generic.903/a97677/mdb.htm) que irá permitir abstrair várias implementações no consumo da fila.  
 ![MDB-Oracle](https://docs.oracle.com/cd/A97688_16/generic.903/a97677/mdba.gif)  
