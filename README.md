@@ -28,8 +28,20 @@ public class AgendamentoEmailJob {
     }
 }
   ```
-# Uso de Fila
-## Configurando fila no Wildfly
+## Uso do Schedule
+Nossa aplicação deve ser executada a cada 10 segundos, para isso, utilizamos a anotação javax.ejb.Schedule. Através dela, é possível definir manualmente o código, como no trecho abaixo.
+```java
+@Schedule(hour = "*", minute = "*", second = "*/10")
+public void enviarEmails() {
+	List<AgendamentoEmail> listaAgendamentos = agendamentoEmailServico.listarPorNaoAgendado();
+	listaAgendamentos.forEach(agendamentoNaoEnviado -> {
+		context.createProducer().send(queue, agendamentoNaoEnviado);
+		agendamentoEmailServico.alterar(agendamentoNaoEnviado);
+	});
+}
+```  
+Nesse nosso exercício, utilizamos a definição do período de forma fixa. Mais abaixo mostro como poderia ser feito dinamicamente.
+## Uso de Fila
 O uso da fila visa evitar que ao ocorrer um erro no envio de um e-mail, a aplicação consiga  enviar os demais e-mails.
 ### Tornando a classe AgendamentoEmail serializável
 Para que seja possível o uso de fila, precisa tornar a classe serializável.
