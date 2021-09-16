@@ -28,19 +28,6 @@ public class AgendamentoEmailJob {
     }
 }
   ```
-## Uso do Schedule
-Nossa aplicação deve ser executada a cada 10 segundos, para isso, utilizamos a anotação javax.ejb.Schedule. Através dela, é possível definir manualmente o código, como no trecho abaixo.
-```java
-@Schedule(hour = "*", minute = "*", second = "*/10")
-public void enviarEmails() {
-	List<AgendamentoEmail> listaAgendamentos = agendamentoEmailServico.listarPorNaoAgendado();
-	listaAgendamentos.forEach(agendamentoNaoEnviado -> {
-		context.createProducer().send(queue, agendamentoNaoEnviado);
-		agendamentoEmailServico.alterar(agendamentoNaoEnviado);
-	});
-}
-```  
-Nesse nosso exercício, utilizamos a definição do período de forma fixa. Mais abaixo mostro como poderia ser feito dinamicamente.
 ## Uso de Fila
 O uso da fila visa evitar que ao ocorrer um erro no envio de um e-mail, a aplicação consiga  enviar os demais e-mails.
 ### Tornando a classe AgendamentoEmail serializável
@@ -97,7 +84,17 @@ public class AgendamentoEmailJob {
 Com o servidor inicializado, acessar o [administrativo do Wildfly](http://127.0.0.1:9990).  
 ![wildfly-admin](https://github.com/thiagovf/agendamento-email/blob/master/wildfly-admin.png?raw=true)
 ## Uso do @Schedule 
-*Voltar a este ponto para detalhar o uso do @Schedule*  
+Nossa aplicação deve ser executada a cada 10 segundos, para isso, utilizamos a anotação javax.ejb.Schedule. Através dela, é possível definir manualmente o código, como no trecho abaixo.
+```java
+@Schedule(hour = "*", minute = "*", second = "*/10")
+public void enviarEmails() {
+	List<AgendamentoEmail> listaAgendamentos = agendamentoEmailServico.listarPorNaoAgendado();
+	listaAgendamentos.forEach(agendamentoNaoEnviado -> {
+		context.createProducer().send(queue, agendamentoNaoEnviado);
+		agendamentoEmailServico.alterar(agendamentoNaoEnviado);
+	});
+}
+```  
 No curso, fizemos uso da anotação @Schedule para que a tarefa seja executada constantemente. Essa parametrização por anotation tem sua utilidade, mas, no ambiente profissional, esbarrou com a necessidade de recuperar a parametrização do banco de dados, fazendo com que ela possa ser setada sem a necessidade de intervenção direta no código. Para isso, usei a classe ```javax.ejb.TimerService```. Conforme o trecho abaixo, ela permite fazer a definição dinâmica.
 ```java
 @Singleton
