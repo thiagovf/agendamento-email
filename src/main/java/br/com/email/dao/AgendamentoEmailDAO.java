@@ -1,6 +1,7 @@
 package br.com.email.dao;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
@@ -15,6 +16,8 @@ import br.com.email.entidade.AgendamentoEmail;
 @Stateless
 @TransactionManagement(TransactionManagementType.BEAN)
 public class AgendamentoEmailDAO {
+	
+	private static final Logger LOGGER = Logger.getLogger(AgendamentoEmailDAO.class.getName());
 
 	@PersistenceContext
 	private EntityManager em;
@@ -40,6 +43,7 @@ public class AgendamentoEmailDAO {
 			userTransaction.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			LOGGER.severe("E-mail do usuário " + agendamentoEmail.getEmail() + " foi enviado.");
 		}
 	}
 	
