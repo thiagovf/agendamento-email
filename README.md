@@ -219,5 +219,6 @@ public class AgendamentoEmailDAO {
 			e.printStackTrace();
 		}
 	}
-}```  
+} 
+```  
 Bom ressaltar que o controle manual teria que ser em um cenário bem específico em que valesse a pena. No exemplo acima, caso trivial, não valeria fazer esse controle manual já que o container resolve isso muito bem pra gente.
