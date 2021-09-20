@@ -198,7 +198,7 @@ servico.enviar(agendamentoEmail);
 ## Controle trasancional
 Como estamos falando de uma aplicação que irá recuperar uma lista de e-mails a ser enviadas, caso ocorra algum erro no envio de um e-mail talvez não faça sentido que todos os demais e-mails da fila não sejam agendados. Dessa forma, é importante pensar bem a estratégia transacional.  
 ### Controle manual
-Agora, ao invés de deixarmos o controle transacional no DAO a critério do container (comportamento default), iremos utilizar a anotação ```@TransactionManagement(TransactionManagementType.BEAN)``` pra definir que o controle vai ser feito pelo bean, injestar o ```UserTransaction``` e todo método que faz mudança no banco teremos que iniciar a transação e fechá-la, conforme trecho de código abaixo.  
+O JTA oferece duas formas de demarcação de transações, Bean-Managed (BMT), e Container-Managed (CMT). Ao invés de deixarmos o controle transacional do DAO a critério do container (comportamento default, CMT), iremos utilizar a anotação ```@TransactionManagement(TransactionManagementType.BEAN)``` pra definir que o controle vai ser feito pelo bean, injetar o ```UserTransaction``` em todo método que faz mudança no banco e, a partir daí, teremos que iniciar a transação e fechá-la, conforme o método alterar no trecho de código abaixo.
 ```java
 @Stateless
 @TransactionManagement(TransactionManagementType.BEAN)
