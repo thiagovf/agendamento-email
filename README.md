@@ -222,3 +222,5 @@ public class AgendamentoEmailDAO {
 } 
 ```  
 Bom ressaltar que o controle manual teria que ser em um cenário bem específico em que valesse a pena. No exemplo acima, caso trivial, não valeria fazer esse controle manual já que o container resolve isso muito bem pra gente.
+## Envio de e-mail
+Durante o curso, utilizamos apenas um ```Thread.sleep(5000);``` para simular o envio do e-mail. Agora faremos as mudanças para que o e-mail seja enviado realmente através do [Jakarta Mail 1.6](https://jakarta.ee/specifications/mail/1.6/), biblioteca usada para enviar e eceber emails independente de protocolo (SMTP, POP3,IMAP). A versão 1.6 é a que é compatível com a Jakarta EE 8 que estamos utilizando.
