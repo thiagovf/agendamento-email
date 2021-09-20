@@ -196,4 +196,28 @@ AgendamentoEmail agendamentoEmail = message.getBody(AgendamentoEmail.class);
 servico.enviar(agendamentoEmail);
 ```
 ## Controle trasancional
-Como estamos falando de uma aplicação que irá recuperar uma lista de e-mails a ser enviadas, caso ocorra algum erro no envio de um e-mail talvez não faça sentido que todos os demais e-mails da fila não sejam agendados. Dessa forma, é importante pensar bem a estratégia transacional.
+Como estamos falando de uma aplicação que irá recuperar uma lista de e-mails a ser enviadas, caso ocorra algum erro no envio de um e-mail talvez não faça sentido que todos os demais e-mails da fila não sejam agendados. Dessa forma, é importante pensar bem a estratégia transacional.  
+### Controle manual
+Agora, ao invés de deixarmos o controle transacional no DAO a critério do container (comportamento default), iremos utilizar a anotação ```@TransactionManagement(TransactionManagementType.BEAN)``` pra definir que o controle vai ser feito pelo bean, injestar o ```UserTransaction``` e todo método que faz mudança no banco teremos que iniciar a transação e fechá-la, conforme trecho de código abaixo.  
+```java
+@Stateless
+@TransactionManagement(TransactionManagementType.BEAN)
+public class AgendamentoEmailDAO {
+
+	@PersistenceContext
+	private EntityManager em;
+	
+	@Inject
+	private UserTransaction userTransaction;
+	
+	public void alterar(AgendamentoEmail agendamentoEmail) {
+		try {
+			userTransaction.begin();
+			em.merge(agendamentoEmail);
+			userTransaction.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}```  
+Bom ressaltar que o controle manual teria que ser em um cenário bem específico em que valesse a pena. No exemplo acima, caso trivial, não valeria fazer esse controle manual já que o container resolve isso muito bem pra gente.
